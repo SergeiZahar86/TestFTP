@@ -62,7 +62,7 @@ namespace TestFTP
                     //Console.WriteLine(filesFTP[i].Name);
                     for(int k = 0; k < filesFTP.Length; k++)
                     {
-                        if(filesFTP[i].Name == Local_Short_listFiles[k])
+                        if(filesFTP[k].Name == Local_Short_listFiles[i])
                         {
                             break;
                         }
@@ -80,7 +80,7 @@ namespace TestFTP
                                     ftp.UploadFile(main_Long_files[s], ($"/{Local_Short_listFiles[i]}/{main_Short_files[s]}"), true);
                                 }
                             }
-                            catch 
+                            catch (Exception a)
                             {
                                 Console.WriteLine("Ошибка при создании папки и копировании файлов");
                             }
@@ -115,7 +115,7 @@ namespace TestFTP
                             ftp.UploadFile(main_Long_files[s], ($"/{Local_Short_listFiles[i]}/{main_Short_files[s]}"), true);
                         }
                     }
-                    catch
+                    catch (Exception a)
                     {
                         Console.WriteLine("Ошибка при создании папки и копировании файлов");
                     }
@@ -133,7 +133,7 @@ namespace TestFTP
                 }
             }
 
-            
+
 
             //ftp.CreateDirectory("testDir");
             //ftp.UploadFile("C:/VisualStudioProject/TestFTP/NET/TestFTP/TestFTP/bin/Debug/test.txt", "/testDir/test.txt", true);
@@ -141,35 +141,89 @@ namespace TestFTP
 
 
             /*string[] fileDetails = ftp.GetFiles();
-            foreach(string a in fileDetails)
+            foreach (string a in fileDetails)
             {
                 Console.WriteLine(a);
-                if(a == "./testDir")
+                if (a == "./testDir")
                 {
                     Console.WriteLine("папка testDir");
                 }
-            }
-            FTPFile[] filesFTP = ftp.GetFileInfos();
-            foreach(FTPFile d in filesFTP)
+            }*/
+            FTPFile[] filesFTP_ = ftp.GetFileInfos();
+            foreach (FTPFile d in filesFTP_)
             {
-                Console.WriteLine(d);
-                if(d.Name == "testDir")
+                Console.WriteLine();
+                Console.WriteLine(d + "информация о файле");
+                Console.WriteLine();
+                Console.WriteLine(d.Dir + " - Dir");
+                Console.WriteLine(d.Group + " - Group");
+                Console.WriteLine(d.LastModified + " - LastModified");
+                Console.WriteLine(d.Link + " - Link");
+                Console.WriteLine(d.LinkCount + " - LinkCount");
+                Console.WriteLine(d.LinkedName + " - LinkedName");
+                Console.WriteLine(d.Name + " - Name");
+                Console.WriteLine(d.Owner + " - Owner");
+                Console.WriteLine(d.Permissions + " - Permissions");
+                Console.WriteLine(d.Raw + " - Raw");
+                Console.WriteLine(d.Size + " - Size");
+                Console.WriteLine(d.Type + " - Type");
+                Console.WriteLine();
+                /*if (d.Name == "testDir")
                 {
                     Console.WriteLine("папка testDir");
-                    ftp.ChangeWorkingDirectory(d.Name);
+                    ftp.ChangeWorkingDirectory(d.Name); // сменить рабочую директорию
                     //foreach()
                     FTPFile[] files__FTP = ftp.GetFileInfos();
-                    foreach(FTPFile g in files__FTP)
+                    foreach (FTPFile g in files__FTP)
                     {
                         Console.WriteLine(g);
                     }
 
+                }*/
+            }
+            // сортировка директории по дате создания (первая самая новая)
+            FTPFile temp;
+            for (int i = 0; i < filesFTP_.Length - 1; i++)
+            {
+                for (int j = i + 1; j < filesFTP_.Length; j++)
+                {
+                    if (filesFTP_[i].LastModified < filesFTP_[j].LastModified)
+                    {
+                        temp = filesFTP_[i];
+                        filesFTP_[i] = filesFTP_[j];
+                        filesFTP_[j] = temp;
+                    }
                 }
             }
-            ftp.Close();
+
+            Console.WriteLine("После сортировки");
+            foreach(FTPFile a in filesFTP_)
+            {
+                Console.WriteLine(a.Name);
+            }
+
+
+            /*if (filesFTP_.Length > 1)
+            {
+                for (int i = 1; i < filesFTP_.Length; i++)
+                {
+                    Console.WriteLine(filesFTP_[i].Name);
+                    ftp.ChangeWorkingDirectory(filesFTP_[i].Name); // сменить рабочую директорию
+                    FTPFile[] files__FTP = ftp.GetFileInfos();
+                    foreach (FTPFile g in files__FTP)
+                    {
+                        ftp.DeleteFile(g.Name);
+                    }
+                    Console.WriteLine("Файлы удалены из директории");
+                    ftp.ChangeWorkingDirectoryUp();
+                    ftp.DeleteDirectory(filesFTP_[i].Name);
+                    Console.WriteLine("Старые директории удалены");
+
+                }
+            }*/
 
             // Список локальных директорий
-            string[] dirs = Directory.GetDirectories(@"D:\\APP", "*", SearchOption.TopDirectoryOnly);
+            /*string[] dirs = Directory.GetDirectories(@"D:\\APP", "*", SearchOption.TopDirectoryOnly);
             for (int i = 0; i < dirs.Length; i++)
             {
                 dirs[i] = new FileInfo(dirs[i]).Name; // Выделяем короткое название из пути
@@ -195,6 +249,7 @@ namespace TestFTP
 
 
 
+            ftp.Close();
             Console.Read();
 
         }
